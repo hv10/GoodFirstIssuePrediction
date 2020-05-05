@@ -4,5 +4,6 @@
 
 ## Research
 
-* [Literature](research/literature.md)
+* [Literature](research/literature/README.md)
+  * [Search Keywords](research/literature/search-keywords.md)
 
