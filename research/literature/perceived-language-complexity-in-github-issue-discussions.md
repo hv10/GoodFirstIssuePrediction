@@ -1,3 +1,7 @@
+---
+description: provides a tool to calculate project-specific perceived language complexity
+---
+
 # Perceived language complexity in GitHub issue discussions
 
 ### Links
