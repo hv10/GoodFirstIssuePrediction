@@ -60,3 +60,11 @@ description: provides a tool to calculate project-specific perceived language co
 
 > We  constructed  a  social  network  for  each  project  using@mentionsin  their  issue  comment  threads.
 
+* they also tracked the network over time
+  * key metric: _indegree_ 
+  * outdegree, betweenness and degree centrality were tracked but not used
+* for each project a _global_ and a _local_ corpus
+  * global: corpus from all projects except current
+  * local: just the current project
+* use _n-gram_ model instead of _lstm_ bc. of computational costs
+

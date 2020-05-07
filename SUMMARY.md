@@ -7,4 +7,5 @@
 * [Literature](research/literature/README.md)
   * [Search Keywords](research/literature/search-keywords.md)
   * [Perceived language complexity in GitHub issue discussions](research/literature/perceived-language-complexity-in-github-issue-discussions.md)
+  * [Metrics as Indicators of Software Vulnerabilities](research/literature/metrics-as-indicators-of-software-vulnerabilities.md)
 
