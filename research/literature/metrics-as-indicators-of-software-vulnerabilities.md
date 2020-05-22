@@ -7,7 +7,7 @@
 
 ## Summary
 
-* assesses which parts of a program have been relevant for bugs
+* assesses which parts of a programs code have been relevant for bugs
 * uses a selection of 28 metrics \(24 of which were discriminative\)
   * all three types of metrics together predicted 80% of all known vulnerable files w/ less than 25% false positives
 

@@ -16,7 +16,7 @@ description: provides a tool to calculate project-specific perceived language co
 * users have different social and cultural identities
   * socioeconomic status, cultural bg, etc.
   * influences how they talk, listen, understand
-* GitHub and OSS projects take on the role of communities in sociologal sense
+* GitHub and OSS projects take on the role of communities in sociological sense
 * have specific language \(project-specific terms, related jargon\)
 * using correct language as mark of standing
 * issues combine narrative style w/ technical arguments
@@ -27,11 +27,11 @@ description: provides a tool to calculate project-specific perceived language co
 
 > A speech community \(SC\) describes a group of people who use language in a way that is mutually accepted among the group
 
-> \[Here\] an example where a member of the out-group \(an end-user\) has an issue. They attempt to express their problem,but the contributing member \(in-group\) is unable to understand the description, and further asks the end-user to conform to project-specific norms \(i.e., fill out the standard issue reportform\)
+> \[Here\] an example where a member of the out-group \(an end-user\) has an issue. They attempt to express their problem,but the contributing member \(in-group\) is unable to understand the description, and further asks the end-user to conform to project-specific norms \(i.e., fill out the standard issue report form\)
 
 > members of a CoP __\[Community of Practice\] do not have to be physically co-located,but can form a “virtual community of practice” with the same attributes as a standard CoP
 
-> Llamas et al. present an example of a CoP within the workplace, saying that individuals regularly engage in scheduled social practices \(e.g.,business mettings\), and mutually define themselvesas CoP members
+> Llamas et al. present an example of a CoP within the workplace, saying that individuals regularly engage in scheduled social practices \(e.g.,business meetings\), and mutually define themselves as CoP members
 
 #### Entropy and Language Complexity
 
@@ -56,13 +56,13 @@ description: provides a tool to calculate project-specific perceived language co
 
 > For every post in an issue thread,  we  gathered  the  following  information:  date  of  post,post body, login of poster, and issue closing time. Post bodies were  used  to  extract  text-related  metadata  and  to  build  our language models
 
-> In addition to examining comments we also collected  a  variety  of  metadata  from  projects.  This  included commit-related  metrics:  number  of  lines  added  and  deleted, date of commit, commit author; and user data: full name, time they joined Github, and location.
+> In addition to examining comments we also collected  a  variety  of  metadata  from  projects.  This  included commit-related  metrics:  number  of  lines  added  and  deleted, date of commit, commit author; and user data: full name, time they joined GitHub, and location.
 
-> We  constructed  a  social  network  for  each  project  using@mentionsin  their  issue  comment  threads.
+> We  constructed  a  social  network  for  each  project  using @mentions in  their  issue  comment  threads.
 
 * they also tracked the network over time
-  * key metric: _indegree_ 
-  * outdegree, betweenness and degree centrality were tracked but not used
+  * key metric: _in-degree_ 
+  * _out-degree_, _between-ness_ and _degree centrality_ were tracked but not used
 * for each project a _global_ and a _local_ corpus
   * global: corpus from all projects except current
   * local: just the current project
