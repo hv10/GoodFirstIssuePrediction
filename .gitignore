@@ -221,4 +221,4 @@ tags
 .vim
 
 # End of https://www.gitignore.io/api/vim,python,pycharm
-
+.env
