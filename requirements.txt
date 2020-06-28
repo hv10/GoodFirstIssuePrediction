@@ -1,1 +1,7 @@
 gitpython
+gensim
+scikit-learn
+matplotlib
+pygithub
+tensorflow-gpu
+beautifulsoup4
