@@ -1,9 +1,14 @@
 import logging
+import logging_setup
 import os
 import sys
+import time
+from math import floor
+
 import yaml
 from pathlib import Path
 from github import Github
+from github.GithubException import RateLimitExceededException
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -23,30 +28,45 @@ def build_global_corpus(
         raise ValueError("No GitHub API access token provided.")
     gh = Github(access_token)
     for repo_name in repo_list:
-        logging.info(msg=f"Working on {repo_name}...")
-        ensure_repo_corpus_folder(repo_name, corpus_path=corpus_path)
-        repo = gh.get_repo(repo_name)
-        issues = [issue for issue in repo.get_issues()]
-        issue_dump = {"comments": []}
-        for issue in issues:
-            logging.info(msg=f"Collecting issue n.{issue.id}")
-            issue_dump["title"] = issue.title
-            issue_dump["body"] = issue.body
-            issue_dump["closed_at"] = issue.closed_at
-            if issue.comments > 0:
-                for comment in issue.get_comments():
-                    issue_dump["comments"].append(
-                        {
-                            "body": comment.body,
-                            "created_at": comment.created_at,
-                            "user_name": comment.user.login,
-                        }
+        try:
+            logging.info(msg=f"Working on {repo_name}...")
+            ensure_repo_corpus_folder(repo_name, corpus_path=corpus_path)
+            repo = gh.get_repo(repo_name)
+            issues = [issue for issue in repo.get_issues(state="all")]
+            issue_dump = {"comments": []}
+            for issue in issues:
+                issue_dump_path = (
+                    corpus_path / repo_name / f"issue{issue.id}.yaml"
+                )
+                if not Path(issue_dump_path).exists() or override:
+                    logging.info(msg=f"Collecting issue n.{issue.id}")
+                    issue_dump["title"] = issue.title
+                    issue_dump["body"] = issue.body
+                    issue_dump["closed_at"] = issue.closed_at
+                    if issue.comments > 0:
+                        for comment in issue.get_comments():
+                            issue_dump["comments"].append(
+                                {
+                                    "body": comment.body,
+                                    "created_at": comment.created_at,
+                                    "user_name": comment.user.login,
+                                }
+                            )
+                        logging.info(msg=f"Writing issue n.{issue.id}")
+                    with open(issue_dump_path, mode="w+") as f:
+                        f.write(yaml.dump(issue_dump))
+                else:
+                    logging.info(
+                        msg=f"Skipping issue n.{issue.id} as it already exists and override is False"
                     )
-            issue_dump_path = corpus_path / repo_name / f"issue{issue.id}.yaml"
-            if not Path(issue_dump_path).exists() or override:
-                logging.info(msg=f"Writing issue n.{issue.id}")
-                with open(issue_dump_path, mode="w+") as f:
-                    f.write(yaml.dump(issue_dump))
+        except RateLimitExceededException as e:
+            logging.error(msg="Waiting for Rate Limit to Run off.")
+            tR = 3600
+            while tR > 0:
+                logging.info(f"Waiting for another {floor(tR/60)}m {tR%60}s")
+                tR -= 5
+                time.sleep(5)
+
         print("\n" + "-" * 20 + "\n")
 
 
@@ -68,9 +88,4 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()],
-    )
     main()

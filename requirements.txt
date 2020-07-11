@@ -6,3 +6,4 @@ pygithub
 tensorflow-gpu
 beautifulsoup4
 python-dotenv
+nltk
