@@ -1,5 +1,6 @@
 import sys
 import logging
+import logging_setup
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
@@ -47,9 +48,4 @@ def extend_repo_list():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()],
-    )
     extend_repo_list()

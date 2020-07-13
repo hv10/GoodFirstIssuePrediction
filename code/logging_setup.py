@@ -2,6 +2,7 @@ import logging
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
+    style="{",
+    format="{asctime}: {levelname[0]} {pathname}:{lineno}] {message}",
     handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()],
 )
