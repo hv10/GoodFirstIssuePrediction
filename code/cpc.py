@@ -4,6 +4,8 @@ This module describes the contrastive predictive coding model from DeepMind:
 Oord, Aaron van den, Yazhe Li, and Oriol Vinyals.
 "Representation Learning with Contrastive Predictive Coding."
 arXiv preprint arXiv:1807.03748 (2018).
+
+Modified to work with Text, via TextVectorization and Embeddings by github.com/hv10
 """
 from data_utils import SortedNumberGenerator
 from os.path import join, basename, dirname, exists

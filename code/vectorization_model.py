@@ -28,18 +28,35 @@ class IssueGenerator(Sequence):
         return self.length
 
 
-def issue_generator(issues):
-    y = ""  # ensure that we dont fail
+def yaml_issue_generator(issues):
+    y = None  # ensure that we dont fail
     for issue in issues:
         try:
-            with open(issue) as f:
+            with open(issue, encoding="utf-8") as f:
                 y = yaml.safe_load(f).get("body", "")
         except Exception as e:
             logging.warning(
                 f"An exception occurred while loading {issue}, ignoring.\n"
                 + f"Exception was: {e}"
             )
+        if y is None or y == "":
+            y = "None"
         yield y
+    return StopIteration
+
+
+def tok_issue_generator(issues):
+    y = ""  # ensure that we dont fail
+    for issue in issues:
+        try:
+            with open(issue) as f:
+                y = f.read()
+        except Exception as e:
+            logging.warning(
+                f"An exception occurred while loading {issue}, ignoring.\n"
+                + f"Exception was: {e}"
+            )
+        yield tf.string()
     return StopIteration
 
 
@@ -62,15 +79,15 @@ if __name__ == "__main__":
     directory = Path(__file__).parent / "corpus"
     issues = [str(e.resolve()) for e in directory.glob("**/*.yaml")]
     small_issues = random.sample(
-        issues, 2000
+        issues, 20000
     )  # 33samples/min --> 6000samples in 3h
     df = tf.data.Dataset.from_generator(
-        issue_generator,
+        yaml_issue_generator,
         args=[small_issues],
         output_types=tf.string,
         output_shapes=(),
     )
     logging.info("Start building vectorization model...")
-    model = make_vektorizer(df.padded_batch(8))
+    model = make_vektorizer(df.padded_batch(16))
     logging.info("Saving...")
-    model.save(str(Path(__file__).parent / "vectorizer_model_2000"))
+    model.save(str(Path(__file__).parent / "vectorizer_model_20000"))

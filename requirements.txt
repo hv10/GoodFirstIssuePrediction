@@ -7,3 +7,4 @@ tensorflow-gpu
 beautifulsoup4
 python-dotenv
 pyyaml
+pillow
