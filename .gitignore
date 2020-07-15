@@ -224,5 +224,3 @@ tags
 .env
 # ignore corpus
 code/corpus
-# ignore models
-code/models
