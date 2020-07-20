@@ -12,7 +12,10 @@ from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.models import load_model
 
 from experiments.algorithms.dnn import make_dnn_model
-from experiments.data_processing.data_generators import IssueGenerator
+from experiments.data_processing.data_generators import (
+    IssueGenerator,
+    CSVIssueClassesGenerator,
+)
 
 """
 def train_cpc_model(
@@ -92,6 +95,8 @@ def train_dnn(
     vectorizer_model=(
         Path(__file__).parent.parent / "models" / "vectorizer_model_20000"
     ),
+    gfi_csv=Path(__file__).parent.parent / "corpus" / "df_gfi_1000.csv",
+    ngfi_csv=Path(__file__).parent.parent / "corpus" / "df_ngfi_1000.csv",
     **kwargs
 ):
     # vectorizer = load_model(vectorizer_model)
@@ -113,8 +118,22 @@ def train_dnn(
     callbacks = [
         ModelCheckpoint(monitor="acc", filepath="{epoch:02d}-{acc:.2f}.hdf5")
     ]
-    data_gen = IssueGenerator(directory=corpus_dir, vectorizer=vectorizer_model)
-    end_to_end_model.fit(data_gen, epochs=100, callbacks=[callbacks])
+    data_gen = CSVIssueClassesGenerator(
+        corpus_path=corpus_dir,
+        vectorizer=vectorizer_model,
+        gfi_csv=gfi_csv,
+        ngfi_csv=ngfi_csv,
+    )
+    val_gen = CSVIssueClassesGenerator(
+        corpus_path=corpus_dir,
+        vectorizer=vectorizer_model,
+        gfi_csv=gfi_csv,
+        ngfi_csv=ngfi_csv,
+        validation_data=True,
+    )
+    end_to_end_model.fit(
+        data_gen, validation_data=val_gen, epochs=100, callbacks=[callbacks]
+    )
 
 
 if __name__ == "__main__":
