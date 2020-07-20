@@ -12,9 +12,9 @@ class GoodFirstIssueGenerator(Sequence):
         self, vectorizer: Path, directory: Path, recursive=True, batch_size=32
     ):
         if recursive:
-            self.issues = list(directory.glob("**/*.yaml"))
+            self.issues = list(directory.glob("**/gfi*.yaml"))
         else:
-            self.issues = list(directory.glob("*.yaml"))
+            self.issues = list(directory.glob("gfi*.yaml"))
         self.length = len(self.issues)
         self.vectorizer = load_model(vectorizer)
         self.batch_size = batch_size

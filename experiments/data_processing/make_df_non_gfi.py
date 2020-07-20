@@ -12,7 +12,7 @@ def main():
 
     rows = []
     i = 0
-    while len(rows) < 500:
+    while len(rows) < 1000:
         print(f"{i:5d}|{len(rows):5d}", end="\r")
         issue_path = files[i]
         try:
@@ -34,7 +34,7 @@ def main():
     df_ngfi = pd.DataFrame(
         rows, columns=["name", "res_time", "n_comments", "label"]
     )
-    df_ngfi.to_csv(Path().resolve() / "df_ngfi.csv")
+    df_ngfi.to_csv(Path().resolve() / "df_ngfi_1000.csv")
     print(df_ngfi)
 
 
