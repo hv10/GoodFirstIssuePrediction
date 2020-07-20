@@ -2,6 +2,9 @@ import logging
 from io import StringIO
 from os.path import join
 from pathlib import Path
+
+from tensorflow.python.keras.callbacks import ModelCheckpoint
+
 import experiments.logging_setup
 
 from tensorflow import keras
@@ -9,6 +12,7 @@ from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.models import load_model
 
 from experiments.algorithms.dnn import make_dnn_model
+from experiments.data_processing.data_generators import IssueGenerator
 
 """
 def train_cpc_model(
@@ -90,19 +94,27 @@ def train_dnn(
     ),
     **kwargs
 ):
-    vectorizer = load_model(vectorizer_model)
-    tmp_smry = StringIO()
-    vectorizer.summary(print_fn=logging.info)
-    vectorizer.summary()
-    logging.info(tmp_smry.getvalue())
+    # vectorizer = load_model(vectorizer_model)
+    # tmp_smry = StringIO()
+    # vectorizer.summary(print_fn=logging.info)
+    # vectorizer.summary()
+    # logging.info(tmp_smry.getvalue())
 
     dnn = make_dnn_model(vocab_size=kwargs.get("vocab_size", 10000))
     dnn.summary()
 
-    end_to_end_model = Sequential([vectorizer, dnn])
+    # end_to_end_model = Sequential([vectorizer, dnn])
+    end_to_end_model = dnn
     end_to_end_model.summary()
 
-    end_to_end_model.compile(optimizer="adam", loss="binary_crossentropy")
+    end_to_end_model.compile(
+        optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]
+    )
+    callbacks = [
+        ModelCheckpoint(monitor="acc", filepath="{epoch:02d}-{acc:.2f}.hdf5")
+    ]
+    data_gen = IssueGenerator(directory=corpus_dir, vectorizer=vectorizer_model)
+    end_to_end_model.fit(data_gen, epochs=100, callbacks=[callbacks])
 
 
 if __name__ == "__main__":

@@ -12,23 +12,26 @@ def main():
     issues = list(corpus_path.glob("**/gfi*.yaml"))
     random.shuffle(issues)
     for i, issue in enumerate(issues):
-        print(f"{i:5d} | {len(rows):5d}", end="\r")
-        if len(rows) == 1000:
-            break
         try:
-            data = yaml.safe_load(open(issue))
+            print(f"{i:5d} | {len(rows):5d}", end="\r")
+            if len(rows) == 1000:
+                break
+            try:
+                data = yaml.safe_load(open(issue))
+            except:
+                data = {"labels": []}
+            # check if yaml actually contains the label
+            if "good first issue" in data.get("labels", []):
+                if data["closed_at"] is not None:
+                    issue_dat = {
+                        "name": issue.relative_to(corpus_path),
+                        "res_time": data["closed_at"] - data["created_at"],
+                        "n_comments": len(data["comments"]),
+                        "label": 1,
+                    }
+                    rows.append(issue_dat)
         except:
-            data = {"labels": []}
-        # check if yaml actually contains the label
-        if "good first issue" in data["labels"]:
-            if data["closed_at"] is not None:
-                issue_dat = {
-                    "name": issue.relative_to(corpus_path),
-                    "res_time": data["closed_at"] - data["created_at"],
-                    "n_comments": len(data["comments"]),
-                    "label": 1,
-                }
-                rows.append(issue_dat)
+            print(f"error encountered in {issue}, skipping...")
 
     print()
     df_gfi = pd.DataFrame(
