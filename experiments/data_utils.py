@@ -1,4 +1,4 @@
-''' This module contains code to handle data '''
+''' This module contains experiments to handle data '''
 
 import os
 import numpy as np

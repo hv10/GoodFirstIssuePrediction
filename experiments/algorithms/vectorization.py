@@ -1,6 +1,5 @@
 import logging
 import random
-import logging_setup
 
 import tensorflow as tf
 from pathlib import Path
@@ -9,23 +8,6 @@ import yaml
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
-from tensorflow.keras.utils import Sequence
-
-
-class IssueGenerator(Sequence):
-    def __init__(self, directory: Path, recursive=True):
-        if recursive:
-            self.issues = list(directory.glob("**/*.yaml"))
-        else:
-            self.issues = list(directory.glob("*.yaml"))
-        self.length = len(self.issues)
-
-    def __getitem__(self, item):
-        data = yaml.safe_load(self.issues[item])
-        return str(data["body"])
-
-    def __len__(self):
-        return self.length
 
 
 def yaml_issue_generator(issues):

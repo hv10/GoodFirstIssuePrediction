@@ -13,7 +13,7 @@ import tensorflow.keras as keras
 from tensorflow.keras import backend as K
 
 
-def network_encoder(x, code_size):
+def make_encoder_network(x, code_size):
 
     """ Define the network mapping images to embeddings """
 
@@ -43,7 +43,7 @@ def network_encoder(x, code_size):
     return x
 
 
-def network_autoregressive(x):
+def make_autoregressive_network(x):
 
     """ Define the network that integrates information along the sequence """
 
@@ -56,7 +56,7 @@ def network_autoregressive(x):
     return x
 
 
-def network_prediction(context, code_size, predict_terms):
+def make_prediction_network(context, code_size, predict_terms):
 
     """ Define the network mapping context to multiple embeddings """
 
@@ -103,7 +103,9 @@ class CPCLayer(keras.layers.Layer):
         return (input_shape[0][0], 1)
 
 
-def network_cpc(text_shape, terms, predict_terms, code_size, learning_rate):
+def make_cpc_network(
+    text_shape, terms, predict_terms, code_size, learning_rate
+):
 
     """ Define the CPC network combining encoder and autoregressive model """
 
@@ -114,7 +116,7 @@ def network_cpc(text_shape, terms, predict_terms, code_size, learning_rate):
     encoder_input = keras.layers.Input(
         text_shape
     )  # TODO: change to embedding -- important
-    encoder_output = network_encoder(encoder_input, code_size)
+    encoder_output = make_encoder_network(encoder_input, code_size)
     encoder_model = keras.models.Model(
         encoder_input, encoder_output, name="encoder"
     )
@@ -123,8 +125,8 @@ def network_cpc(text_shape, terms, predict_terms, code_size, learning_rate):
     # Define rest of model
     x_input = keras.layers.Input((terms, text_shape[0]))
     x_encoded = keras.layers.TimeDistributed(encoder_model)(x_input)
-    context = network_autoregressive(x_encoded)
-    preds = network_prediction(context, code_size, predict_terms)
+    context = make_autoregressive_network(x_encoded)
+    preds = make_prediction_network(context, code_size, predict_terms)
 
     y_input = keras.layers.Input((predict_terms, text_shape[0]))
     y_encoded = keras.layers.TimeDistributed(encoder_model)(y_input)
@@ -146,88 +148,3 @@ def network_cpc(text_shape, terms, predict_terms, code_size, learning_rate):
     cpc_model.summary()
 
     return cpc_model
-
-
-def train_model(
-    epochs,
-    batch_size,
-    output_dir,
-    code_size,
-    lr=1e-4,
-    terms=4,
-    predict_terms=4,
-    image_size=28,
-    color=False,
-):
-
-    # Prepare data
-    train_data = SortedNumberGenerator(
-        batch_size=batch_size,
-        subset="train",
-        terms=terms,
-        positive_samples=batch_size // 2,
-        predict_terms=predict_terms,
-        image_size=image_size,
-        color=color,
-        rescale=True,
-    )
-
-    validation_data = SortedNumberGenerator(
-        batch_size=batch_size,
-        subset="valid",
-        terms=terms,
-        positive_samples=batch_size // 2,
-        predict_terms=predict_terms,
-        image_size=image_size,
-        color=color,
-        rescale=True,
-    )
-
-    # Prepares the model
-    model = network_cpc(
-        text_shape=(image_size, image_size, 3),
-        terms=terms,
-        predict_terms=predict_terms,
-        code_size=code_size,
-        learning_rate=lr,
-    )
-
-    # Callbacks
-    callbacks = [
-        keras.callbacks.ReduceLROnPlateau(
-            monitor="val_loss", factor=1 / 3, patience=2, min_lr=1e-4
-        )
-    ]
-
-    # Trains the model
-    model.fit_generator(
-        generator=train_data,
-        steps_per_epoch=len(train_data),
-        validation_data=validation_data,
-        validation_steps=len(validation_data),
-        epochs=epochs,
-        verbose=1,
-        callbacks=callbacks,
-    )
-
-    # Saves the model
-    # Remember to add custom_objects={'CPCLayer': CPCLayer} to load_model when loading from disk
-    model.save(join(output_dir, "cpc.h5"))
-
-    # Saves the encoder alone
-    encoder = model.layers[1].layer
-    encoder.save(join(output_dir, "encoder.h5"))
-
-
-if __name__ == "__main__":
-    train_model(
-        epochs=10,
-        batch_size=32,
-        output_dir="models/64x64",
-        code_size=128,
-        lr=1e-3,
-        terms=4,
-        predict_terms=4,
-        image_size=64,
-        color=True,
-    )

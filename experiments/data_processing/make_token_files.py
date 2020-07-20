@@ -1,6 +1,6 @@
 import logging
 import asyncio
-import logging_setup
+import experiments.logging_setup
 from pathlib import Path
 
 import yaml

@@ -223,4 +223,4 @@ tags
 # End of https://www.gitignore.io/api/vim,python,pycharm
 .env
 # ignore corpus
-code/corpus
+experiments/corpus
