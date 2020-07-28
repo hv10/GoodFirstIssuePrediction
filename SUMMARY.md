@@ -10,7 +10,3 @@
   * [Metrics as Indicators of Software Vulnerabilities](research/literature/metrics-as-indicators-of-software-vulnerabilities.md)
   * [How we built the good first issues feature](research/literature/how-we-built-the-good-first-issues-feature.md)
 
-## Presentations
-
-* [First Phase](presentations/first-phase.md)
-
