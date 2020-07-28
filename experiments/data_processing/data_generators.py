@@ -33,7 +33,7 @@ class IssueGenerator(Sequence):
             data = yaml.safe_load(open(self.issues[item + i % self.length]))
             try:
                 body = data.get("body", "None")
-                if body == "":
+                if body == "" or body is None or type(body) is not str:
                     body = "None"
             except:
                 body = "None"
@@ -106,14 +106,16 @@ class CSVIssueClassesGenerator(Sequence):
         batches_collected = 0
         i = 0
         while batches_collected < self.batch_size:
-            issue = self.issues.iloc[item + i % self.length]
+            issue = self.issues.iloc[
+                ((item * self.batch_size) + i) % self.length
+            ]
             issue_path = self.corpus_path / issue["name"]
             logging.debug(f"Issue Path> {issue_path}")
             # collect further batches
             data = yaml.safe_load(open(issue_path))
             try:
                 body = data.get("body", "None")
-                if body == "":
+                if body == "" or body is None or type(body) is not str:
                     body = "None"
             except:
                 body = "None"
