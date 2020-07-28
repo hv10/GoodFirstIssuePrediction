@@ -62,7 +62,7 @@ Technologies Used:
 
 ### Basic Usage
 
-### Included Artifacts
+#### Included Artifacts
 
 To make the work more reproducible some artifacts are included in the repository. They represent information used to archieve certain statistical test and can be reused to \(hopefully\) arrive at similar conclusions.
 
