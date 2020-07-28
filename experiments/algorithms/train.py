@@ -1,16 +1,18 @@
 import logging
+import sys
 from io import StringIO
 from os.path import join
 from pathlib import Path
 
 from tensorflow.python.keras.callbacks import ModelCheckpoint
 
-import experiments.logging_setup
+from experiments import logging_setup
 
 from tensorflow import keras
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.models import load_model
 
+from experiments.algorithms.cnn import make_cnn_model
 from experiments.algorithms.dnn import make_dnn_model
 from experiments.data_processing.data_generators import (
     IssueGenerator,
@@ -115,9 +117,7 @@ def train_dnn(
     end_to_end_model.compile(
         optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]
     )
-    callbacks = [
-        ModelCheckpoint(monitor="acc", filepath="{epoch:02d}-{acc:.2f}.hdf5")
-    ]
+    callbacks = [ModelCheckpoint(filepath="{epoch:03d}_dnn.hdf5")]
     data_gen = CSVIssueClassesGenerator(
         corpus_path=corpus_dir,
         vectorizer=vectorizer_model,
@@ -136,5 +136,62 @@ def train_dnn(
     )
 
 
+def train_cnn(
+    corpus_dir=(Path(__file__).parent.parent / "corpus"),
+    vectorizer_model=(
+        Path(__file__).parent.parent / "models" / "vectorizer_model_20000"
+    ),
+    gfi_csv=Path(__file__).parent.parent / "corpus" / "df_gfi_1000.csv",
+    ngfi_csv=Path(__file__).parent.parent / "corpus" / "df_ngfi_1000.csv",
+    **kwargs
+):
+    # vectorizer = load_model(vectorizer_model)
+    # tmp_smry = StringIO()
+    # vectorizer.summary(print_fn=logging.info)
+    # vectorizer.summary()
+    # logging.info(tmp_smry.getvalue())
+
+    cnn = make_cnn_model(vocab_size=kwargs.get("vocab_size", 10000))
+
+    # end_to_end_model = Sequential([vectorizer, dnn])
+    end_to_end_model = cnn
+    end_to_end_model.summary()
+
+    end_to_end_model.compile(
+        optimizer="adam",
+        loss="binary_crossentropy",
+        metrics=[
+            keras.metrics.Accuracy(),
+            keras.metrics.Recall(),
+            keras.metrics.Precision(),
+            keras.metrics.AUC(),
+        ],
+    )
+    callbacks = [ModelCheckpoint(filepath="{epoch:03d}_cnn.hdf5")]
+    data_gen = CSVIssueClassesGenerator(
+        corpus_path=corpus_dir,
+        vectorizer=vectorizer_model,
+        gfi_csv=gfi_csv,
+        ngfi_csv=ngfi_csv,
+    )
+    val_gen = CSVIssueClassesGenerator(
+        corpus_path=corpus_dir,
+        vectorizer=vectorizer_model,
+        gfi_csv=gfi_csv,
+        ngfi_csv=ngfi_csv,
+        validation_data=True,
+    )
+    end_to_end_model.fit(
+        data_gen, validation_data=val_gen, epochs=100, callbacks=[callbacks]
+    )
+
+
+def main():
+    if sys.argv[1] == "dnn":
+        train_dnn()
+    elif sys.argv[1] == "cnn":
+        train_cnn()
+
+
 if __name__ == "__main__":
-    train_dnn()
+    main()

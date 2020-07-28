@@ -1,0 +1,12 @@
+gitpython
+gensim
+scikit-learn
+matplotlib
+pygithub
+tensorflow-gpu
+beautifulsoup4
+python-dotenv
+pyyaml
+pillow
+pandas
+numpy
