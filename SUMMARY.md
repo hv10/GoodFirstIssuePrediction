@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Initial page](README.md)
+* [Issue Complexity Prediction by Issue Content](README.md)
 
 ## Research
 
