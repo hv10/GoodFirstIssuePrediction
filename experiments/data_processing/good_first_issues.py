@@ -25,6 +25,26 @@ def collect_good_first_issues(
     corpus_path=(Path(__file__).parent / "corpus" / "good_first_issues"),
     override=False,
 ):
+    """
+    I collect good first issues from GitHub repositories which have at least five of them.
+
+    The corpus will follow this convention:
+        corpus
+            |-<owner>
+              |-<repo_name>
+                |- gfi_issueXXXX.yaml
+                |- gfi_issueXYXY.yaml
+                ...
+              ...
+            |-<owner2>
+              |-<repo_name>
+              ...
+
+    :param access_token: GitHub API access token
+    :param corpus_path: path where the corpus shall be built (or extended)
+    :param override: if the issue exists should I overwrite it?
+    :return: None
+    """
     if not access_token:
         raise ValueError("No GitHub API access token provided.")
     gh = Github(access_token)
@@ -88,6 +108,12 @@ def collect_good_first_issues(
 
 
 def main():
+    """
+    I load the access token and if given the path to the directory for the corpus.
+    Then I start the crawl.
+    :return: None
+    """
+    # TODO: add CLI
     load_dotenv(find_dotenv())
     access_token = os.getenv("GITHUB_ACCESS_TOKEN")
     if len(sys.argv) > 1:

@@ -20,6 +20,11 @@ def get_repo_name(repo):
 
 
 def get_trending_repos():
+    """
+    I scrape GitHub for the currently trending repositories and add those to a list for later usage.
+
+    :return: list of currently trending repositories
+    """
     trending_repos = []
     for url in [DAILY_URL, WEEKLY_URL, MONTHLY_URL]:
         trending_obj = BeautifulSoup(urlopen(url), "html.parser")
@@ -35,6 +40,13 @@ def get_trending_repos():
 
 
 def extend_repo_list():
+    """
+    I scrape GitHub for the trending repositories and add those to an ever-growing repo list file.
+    My collection contains the daily, weekly and monthly trending repositories.
+    I will not enter duplicates into the repos file.
+    :return: True when successful
+    """
+    # TODO: add CLI
     with open(Path().parent / "trending_repos.repo", mode="a+") as tf:
         tf.seek(0)
         repo_list = [el.strip() for el in tf.readlines()]

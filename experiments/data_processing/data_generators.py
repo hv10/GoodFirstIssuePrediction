@@ -23,6 +23,18 @@ class CSVIssueClassesGenerator(Sequence):
         validation_data=False,
         random_state=420,
     ):
+        """
+        I am the data generator which loads issues noted down in corresponding csv files.
+
+        :param vectorizer: path to the vectorizer model
+        :param corpus_path: path to the corpus
+        :param ngfi_csv: path to csv file for non good first issues
+        :param gfi_csv: path to csv file for good first issues
+        :param batch_size:
+        :param val_split: how much of the data should be for validation (fraction btw. 0-1)
+        :param validation_data: flag to disable validation data altogether (useful for final training)
+        :param random_state: int as my random state (so that the validation and train data split the same way)
+        """
         gfi_paths = pd.read_csv(gfi_csv)
         if "label" not in gfi_paths.columns:
             gfi_paths.insert(0, "label", 1)

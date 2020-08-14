@@ -4,6 +4,14 @@ import shutil
 
 
 def main(corpus_path, gfi_csv, ngfi_csv):
+    """
+    I only exist bc. @hv10 needed to not train on his machine and wanted to copy the relevant data to a netshare.
+
+    :param corpus_path:
+    :param gfi_csv:
+    :param ngfi_csv:
+    :return:
+    """
     corpus_path = Path(corpus_path).resolve()
     gfis = pd.read_csv(gfi_csv)
     ngfis = pd.read_csv(ngfi_csv)

@@ -24,8 +24,28 @@ def build_global_corpus(
     access_token=None,
     corpus_path=(Path.cwd() / "corpus"),
     override=False,
-    update=False,
 ):
+    """
+    I collect **all** issues of the given repos in repo_list and put them into corpus_path.
+
+    The corpus will follow this convention:
+        corpus
+            |-<owner>
+              |-<repo_name>
+                |- issueXXXX.yaml
+                |- issueXYXY.yaml
+                ...
+              ...
+            |-<owner2>
+              |-<repo_name>
+              ...
+
+    :param repo_list: list of to be crawled repositories
+    :param access_token: GitHub API access token
+    :param corpus_path: path where the corpus shall be built (or extended)
+    :param override: if the issue exists should I overwrite?
+    :return: None
+    """
     if not access_token:
         raise ValueError("No GitHub API access token provided.")
     gh = Github(access_token)
@@ -124,6 +144,13 @@ def build_global_corpus_from_file(
 
 
 def main():
+    """
+    I load the access token and if given the path to the .repo file containing the list of to crawl repositories.
+    Then I start the crawl.
+
+    :return: None
+    """
+    # TODO: add CLI
     load_dotenv(find_dotenv())
     access_token = os.getenv("GITHUB_ACCESS_TOKEN")
     if len(sys.argv) > 1:

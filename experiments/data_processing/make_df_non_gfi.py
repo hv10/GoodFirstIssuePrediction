@@ -5,6 +5,13 @@ from pathlib import Path
 
 
 def main():
+    """
+    I collect the data needed for the statistical tests for the class of non good first issues.
+    My output csv can also be used for the later training of the ML models.
+    I collect at most 1000 samples.
+
+    :return: None
+    """
     # Load the good_first_issue data
     corpus_path = Path().resolve().parent / "corpus"
     files = list(corpus_path.glob("**/*.yaml"))
@@ -39,4 +46,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # TODO: add CLI opt. for corpus- and output-path
     main()

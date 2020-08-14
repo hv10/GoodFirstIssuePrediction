@@ -6,6 +6,13 @@ from pathlib import Path
 
 
 def main():
+    """
+    I load the data needed for the statistical tests for the class of good first issues.
+    My output csv can also be used for the later training of the ML models.
+    I collect at most 1000 samples.
+
+    :return: None
+    """
     # Load the good_first_issue data
     corpus_path = Path().resolve().parent / "corpus"
     rows = []
@@ -38,8 +45,8 @@ def main():
         rows, columns=["name", "res_time", "n_comments", "label"]
     )
     df_gfi.to_csv(Path().resolve() / "df_gfi_1000.csv")
-    print(df_gfi)
 
 
 if __name__ == "__main__":
+    # TODO: add CLI opt. for corpus- and output-path
     main()
