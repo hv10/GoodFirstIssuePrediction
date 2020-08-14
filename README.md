@@ -1,5 +1,5 @@
 # Issue Complexity Prediction by Issue Content
-**OR:** How the GitHub "good first issue" functionality works / could be improved upon.
+**OR:** How the GitHub "good first issue" functionality works / could be improved upon. **(WIP)**
 
 Technologies Used:
 - [Jupyter Notebooks]() (Statistical Testing & Reporting)
