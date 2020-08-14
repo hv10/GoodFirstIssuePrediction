@@ -12,19 +12,24 @@ Technologies Used:
 # Getting Started
 ## Setup
 1. Make sure you have `python` and `docker` installed.
-1. Clone the repository.
-1. Install the requirements via `$ pip install -r requirements.txt`
-1. Get your Personal GitHub API Access Token [here]()
-    1.  Put the AccessToken into a ".env" file inside the root repo folder
-    as follows: 
-        ```shell script
-        GITHUB_ACCESS_TOKEN=<your token here>
-        ```
-1. If you want to use a prepared GPU ready tensorflow setup run:
-    ```shell script
-    $ docker build -t hv10/crmproject tfcontainer/
-    ```
+2. Clone the repository.
+3. Install the requirements via `$ pip install -r requirements.txt`
+4. Get your Personal GitHub API Access Token [here]() 1. Put the AccessToken into a ".env" file inside the root repo folder
+
+   as follows:
+
+   ```shell script
+   GITHUB_ACCESS_TOKEN=<your_access_token>
+   ```
+
+5. If you want to use a prepared GPU ready tensorflow setup run:
+
+   ```shell script
+   $ docker build -t hv10/crmproject tfcontainer/
+   ```
+
    inside the repository folder.
+
    This only makes sense if you want to train the Neural Networks yourself
    and if you are unsure about how to setup tensorflow+gpu correctly.
 1. To run most of the scripts you will need to install this repository as a dev. package in python.
