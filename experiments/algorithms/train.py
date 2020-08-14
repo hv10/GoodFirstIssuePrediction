@@ -1,3 +1,8 @@
+"""
+I am the module responsible for training the DNN & CNN model end-to-end.
+You can ask me for my interface by calling upon me with the `-h` flag.
+"""
+
 import argparse
 import logging
 import sys
@@ -15,12 +20,9 @@ from tensorflow.python.keras.models import load_model
 
 from experiments.algorithms.cnn import make_cnn_model
 from experiments.algorithms.dnn import make_dnn_model
-from experiments.data_processing.data_generators import (
-    IssueGenerator,
-    CSVIssueClassesGenerator,
-)
+from experiments.data_processing.data_generators import CSVIssueClassesGenerator
 
-
+# TODO: maybe combine into one function as they differ in only one line
 def train_dnn(
     corpus_dir=(Path(__file__).parent.parent / "corpus"),
     vectorizer_model=(
@@ -28,13 +30,23 @@ def train_dnn(
     ),
     gfi_csv=Path(__file__).parent.parent / "corpus" / "df_gfi_1000.csv",
     ngfi_csv=Path(__file__).parent.parent / "corpus" / "df_ngfi_1000.csv",
+    output_dir=Path(),
     **kwargs
 ):
-    # vectorizer = load_model(vectorizer_model)
-    # tmp_smry = StringIO()
-    # vectorizer.summary(print_fn=logging.info)
-    # vectorizer.summary()
-    # logging.info(tmp_smry.getvalue())
+    """
+    I am the training routine for the DNN model.
+
+    :param corpus_dir: directory in which the issue corpus lives
+    :param vectorizer_model: path to the vectorizer model
+    :param gfi_csv: path to the good first issue list (csv-file)
+    :param ngfi_csv: path to the non good first issue list (csv-file)
+    :param output_dir: path to where we should put the model checkpoints
+    :param kwargs: extra arguments (e.g. vocab_size)
+    :return:
+    """
+
+    if not output_dir.is_dir():
+        output_dir = output_dir.parent
 
     dnn = make_dnn_model(vocab_size=kwargs.get("vocab_size", 10000))
     dnn.summary()
@@ -46,7 +58,9 @@ def train_dnn(
     end_to_end_model.compile(
         optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"]
     )
-    callbacks = [ModelCheckpoint(filepath="{epoch:03d}_dnn.hdf5")]
+    callbacks = [
+        ModelCheckpoint(filepath=str(output_dir / "{epoch:03d}_dnn.hdf5"))
+    ]
     data_gen = CSVIssueClassesGenerator(
         corpus_path=corpus_dir,
         vectorizer=vectorizer_model,
@@ -72,13 +86,22 @@ def train_cnn(
     ),
     gfi_csv=Path(__file__).parent.parent / "corpus" / "df_gfi_1000.csv",
     ngfi_csv=Path(__file__).parent.parent / "corpus" / "df_ngfi_1000.csv",
+    output_dir=Path(),
     **kwargs
 ):
-    # vectorizer = load_model(vectorizer_model)
-    # tmp_smry = StringIO()
-    # vectorizer.summary(print_fn=logging.info)
-    # vectorizer.summary()
-    # logging.info(tmp_smry.getvalue())
+    """
+    I am the training routine for the CNN model.
+
+    :param corpus_dir: directory in which the issue corpus lives
+    :param vectorizer_model: path to the vectorizer model
+    :param gfi_csv: path to the good first issue list (csv-file)
+    :param ngfi_csv: path to the non good first issue list (csv-file)
+    :param output_dir: path to where we should put the model checkpoints
+    :param kwargs: extra arguments (e.g. vocab_size)
+    :return:
+    """
+    if not output_dir.is_dir():
+        output_dir = output_dir.parent
 
     cnn = make_cnn_model(vocab_size=kwargs.get("vocab_size", 10000))
 
@@ -96,7 +119,9 @@ def train_cnn(
             keras.metrics.AUC(),
         ],
     )
-    callbacks = [ModelCheckpoint(filepath="{epoch:03d}_cnn.hdf5")]
+    callbacks = [
+        ModelCheckpoint(filepath=str(output_dir / "{epoch:03d}_cnn.hdf5"))
+    ]
     data_gen = CSVIssueClassesGenerator(
         corpus_path=corpus_dir,
         vectorizer=vectorizer_model,
@@ -124,6 +149,7 @@ def main(
             vectorizer_model=vectorizer,
             gfi_csv=gfi_csv,
             ngfi_csv=ngfi_csv,
+            output_dir=output_dir,
         )
     elif mode == "cnn":
         train_cnn(
@@ -131,6 +157,7 @@ def main(
             vectorizer_model=vectorizer,
             gfi_csv=gfi_csv,
             ngfi_csv=ngfi_csv,
+            output_dir=output_dir,
         )
 
 

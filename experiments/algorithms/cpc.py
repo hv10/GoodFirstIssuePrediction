@@ -14,8 +14,7 @@ from tensorflow.keras import backend as K
 
 
 def make_encoder_network(x, code_size):
-
-    """ Define the network mapping images to embeddings """
+    """ Define the network mapping text vectors to embeddings """
 
     x = keras.layers.Conv1D(
         filters=64, kernel_size=3, strides=2, activation="linear"
@@ -44,11 +43,11 @@ def make_encoder_network(x, code_size):
 
 
 def make_autoregressive_network(x):
-
     """ Define the network that integrates information along the sequence """
 
     # x = keras.layers.GRU(units=256, return_sequences=True)(x)
     # x = keras.layers.BatchNormalization()(x)
+    # Having a non deep model here makes the training speed up quite a lot, normally with little performance hits.
     x = keras.layers.GRU(units=256, return_sequences=False, name="ar_context")(
         x
     )
@@ -57,7 +56,6 @@ def make_autoregressive_network(x):
 
 
 def make_prediction_network(context, code_size, predict_terms):
-
     """ Define the network mapping context to multiple embeddings """
 
     outputs = []
@@ -79,7 +77,6 @@ def make_prediction_network(context, code_size, predict_terms):
 
 
 class CPCLayer(keras.layers.Layer):
-
     """ Computes dot product between true and predicted embedding vectors """
 
     def __init__(self, **kwargs):
@@ -106,7 +103,6 @@ class CPCLayer(keras.layers.Layer):
 def make_cpc_network(
     text_shape, terms, predict_terms, code_size, learning_rate
 ):
-
     """ Define the CPC network combining encoder and autoregressive model """
 
     # Set learning phase (https://stackoverflow.com/questions/42969779/keras-error-you-must-feed-a-value-for-placeholder-tensor-bidirectional-1-keras)

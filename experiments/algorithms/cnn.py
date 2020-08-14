@@ -9,11 +9,18 @@ from tensorflow.python.keras.layers import (
     Conv1D,
     BatchNormalization,
     LeakyReLU,
-    GlobalMaxPooling1D
+    GlobalMaxPooling1D,
 )
 
 
 def make_cnn_model(vocab_size=10000, embed_dim=8, input_seq_length=20):
+    """
+    I am the builder function for the CNN Model.
+    :param vocab_size: size of the vocabulary of the embedding, should be size of vocab of the vectorizer
+    :param embed_dim: how many dimensions to use for the vector embedding
+    :param input_seq_length: how long the sequence of inputs will be
+    :return: Keras Model
+    """
     x = inp = Input(shape=(None,), dtype="int64")
     x = Embedding(
         input_dim=vocab_size,
