@@ -41,8 +41,8 @@ def collect_good_first_issues(
                     state="all", labels=["good first issue"]
                 )
             ]
-            issue_dump = {"comments": []}
             for issue in issues:
+                issue_dump = {"comments": []}
                 issue_dump_path = (
                     corpus_path
                     / repo.owner.name

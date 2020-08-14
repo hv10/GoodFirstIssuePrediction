@@ -57,8 +57,8 @@ def make_vektorizer(vocab, max_features=10000, max_len=None, ngrams_size=None):
     return Model(inputs=[input], outputs=[output])
 
 
-if __name__ == "__main__":
-    directory = Path(__file__).parent / "corpus"
+def main():
+    directory = Path().resolve().parent / "corpus"
     issues = [str(e.resolve()) for e in directory.glob("**/*.yaml")]
     small_issues = random.sample(
         issues, 20000
@@ -72,4 +72,8 @@ if __name__ == "__main__":
     logging.info("Start building vectorization model...")
     model = make_vektorizer(df.padded_batch(16))
     logging.info("Saving...")
-    model.save(str(Path(__file__).parent / "vectorizer_model_20000"))
+    model.save(str(Path(__file__).parent / "vectorizer_model_20090"))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,7 @@
 import sys
 import logging
+from pathlib import Path
+
 import experiments.logging_setup
 from urllib.request import urlopen
 
@@ -33,7 +35,7 @@ def get_trending_repos():
 
 
 def extend_repo_list():
-    with open("../trending_repos.repo", mode="a+") as tf:
+    with open(Path().parent / "trending_repos.repo", mode="a+") as tf:
         tf.seek(0)
         repo_list = [el.strip() for el in tf.readlines()]
         logging.info(f"Trending Repos Contains {len(repo_list)} repos.")

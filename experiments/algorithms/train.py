@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sys
 from io import StringIO
@@ -18,78 +19,6 @@ from experiments.data_processing.data_generators import (
     IssueGenerator,
     CSVIssueClassesGenerator,
 )
-
-"""
-def train_cpc_model(
-    epochs,
-    batch_size,
-    output_dir,
-    code_size,
-    lr=1e-4,
-    terms=4,
-    predict_terms=4,
-    image_size=28,
-    color=False,
-):
-
-    # Prepare data
-    train_data = SortedNumberGenerator(
-        batch_size=batch_size,
-        subset="train",
-        terms=terms,
-        positive_samples=batch_size // 2,
-        predict_terms=predict_terms,
-        image_size=image_size,
-        color=color,
-        rescale=True,
-    )
-
-    validation_data = SortedNumberGenerator(
-        batch_size=batch_size,
-        subset="valid",
-        terms=terms,
-        positive_samples=batch_size // 2,
-        predict_terms=predict_terms,
-        image_size=image_size,
-        color=color,
-        rescale=True,
-    )
-
-    # Prepares the model
-    model = make_cpc_network(
-        text_shape=(image_size, image_size, 3),
-        terms=terms,
-        predict_terms=predict_terms,
-        code_size=code_size,
-        learning_rate=lr,
-    )
-
-    # Callbacks
-    callbacks = [
-        keras.callbacks.ReduceLROnPlateau(
-            monitor="val_loss", factor=1 / 3, patience=2, min_lr=1e-4
-        )
-    ]
-
-    # Trains the model
-    model.fit_generator(
-        generator=train_data,
-        steps_per_epoch=len(train_data),
-        validation_data=validation_data,
-        validation_steps=len(validation_data),
-        epochs=epochs,
-        verbose=1,
-        callbacks=callbacks,
-    )
-
-    # Saves the model
-    # Remember to add custom_objects={'CPCLayer': CPCLayer} to load_model when loading from disk
-    model.save(join(output_dir, "cpc.h5"))
-
-    # Saves the encoder alone
-    encoder = model.layers[1].layer
-    encoder.save(join(output_dir, "encoder.h5"))
-"""
 
 
 def train_dnn(
@@ -186,12 +115,61 @@ def train_cnn(
     )
 
 
-def main():
-    if sys.argv[1] == "dnn":
-        train_dnn()
-    elif sys.argv[1] == "cnn":
-        train_cnn()
+def main(
+    corpus, vectorizer, gfi_csv, ngfi_csv, mode="dnn", output_dir=Path.cwd()
+):
+    if mode == "dnn":
+        train_dnn(
+            corpus_dir=corpus,
+            vectorizer_model=vectorizer,
+            gfi_csv=gfi_csv,
+            ngfi_csv=ngfi_csv,
+        )
+    elif mode == "cnn":
+        train_cnn(
+            corpus_dir=corpus,
+            vectorizer_model=vectorizer,
+            gfi_csv=gfi_csv,
+            ngfi_csv=ngfi_csv,
+        )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="CLI for training the main two ML models."
+    )
+    parser.add_argument(
+        "mode",
+        choices=["cnn", "dnn"],
+        help="Which type of model should be trained?",
+    )
+    parser.add_argument(
+        "-c",
+        "--corpus",
+        type=Path,
+        required=True,
+        help="path to the corpus directory",
+    )
+    parser.add_argument(
+        "-v",
+        "--vectorizer",
+        type=Path,
+        required=True,
+        help="path to the vectorizer model",
+    )
+    parser.add_argument(
+        "-g", "--gfi_csv", type=Path, required=True, help="path to gfi_csv"
+    )
+    parser.add_argument(
+        "-n", "--ngfi_csv", type=Path, required=True, help="path to ngfi_csv"
+    )
+    parser.add_argument(
+        "-o",
+        "--output_dir",
+        type=Path,
+        default=Path.cwd(),
+        help="where the models should be output to (defaults to cwd)",
+    )
+    args = parser.parse_args()
+    print(args)
+    main(**vars(args))
