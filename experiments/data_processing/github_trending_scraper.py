@@ -1,3 +1,4 @@
+import argparse
 import sys
 import logging
 from pathlib import Path
@@ -39,7 +40,7 @@ def get_trending_repos():
     return trending_repos
 
 
-def extend_repo_list():
+def extend_repo_list(repo_list=Path().resolve().parent / "trending_repos.repo"):
     """
     I scrape GitHub for the trending repositories and add those to an ever-growing repo list file.
     My collection contains the daily, weekly and monthly trending repositories.
@@ -47,7 +48,7 @@ def extend_repo_list():
     :return: True when successful
     """
     # TODO: add CLI
-    with open(Path().parent / "trending_repos.repo", mode="r+") as tf:
+    with open(repo_list, mode="r+") as tf:
         repo_list = [el.strip() for el in tf.readlines()]
         logging.info(f"Trending Repos Contains {len(repo_list)} repos.")
         new_trending_repos = [
@@ -61,4 +62,15 @@ def extend_repo_list():
 
 
 if __name__ == "__main__":
-    extend_repo_list()
+    parser = argparse.ArgumentParser(
+        description="I extend the repo list with the newest unseen trending repos from GitHub"
+    )
+    parser.add_argument(
+        "-i",
+        "--repo_list",
+        type=Path,
+        help="path to the repo list file",
+        default=Path().resolve().parent / "trending_repos.repo",
+    )
+    args = parser.parse_args()
+    extend_repo_list(**vars(args))
