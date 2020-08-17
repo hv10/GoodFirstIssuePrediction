@@ -120,6 +120,13 @@ if __name__ == "__main__":
         default=Path.cwd(),
         help="where the models should be output to (defaults to cwd)",
     )
+    parser.add_argument(
+        "-e",
+        "--extra_args",
+        type=dict,
+        default={},
+        help="extra arguments for the model internals",
+    )
     args = parser.parse_args()
     print(args)
-    train_model(**vars(args))
+    train_model(**vars(args), **args.extra_args)
