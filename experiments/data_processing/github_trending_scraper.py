@@ -47,8 +47,7 @@ def extend_repo_list():
     :return: True when successful
     """
     # TODO: add CLI
-    with open(Path().parent / "trending_repos.repo", mode="a+") as tf:
-        tf.seek(0)
+    with open(Path().parent / "trending_repos.repo", mode="r+") as tf:
         repo_list = [el.strip() for el in tf.readlines()]
         logging.info(f"Trending Repos Contains {len(repo_list)} repos.")
         new_trending_repos = [
