@@ -5,7 +5,7 @@ import os
 
 import yaml
 from dotenv import load_dotenv, find_dotenv
-from github import Github
+from github import Github, UnknownObjectException
 
 import experiments.logging_setup
 from pathlib import Path
@@ -36,37 +36,56 @@ def main(
             logging.info(f"{i}/{issue_num}")
         issue_name = Path(row["name"])
         ensure_repo_corpus_folder(str(issue_name.parent), corpus_dir)
-        if c_repo_str != str(issue_name.parent):
-            c_repo = gh.get_repo(str(issue_name.parent))
-        issue = c_repo.get_issue(int(re.sub("[^0-9]+", "", issue_name.stem)))
-        issue_dump_path = (
-            corpus_dir / issue_name.parent / f"issue{issue.number}.yaml"
-        )
-        issue_dump = {"comments": []}
-        if not Path(issue_dump_path).exists() or override:
-            logging.info(msg=f"Collecting issue {issue_name}/n.{issue.number}")
-            issue_dump["title"] = issue.title
-            issue_dump["body"] = issue.body
-            issue_dump["closed_at"] = issue.closed_at
-            issue_dump["created_at"] = issue.created_at
-            issue_dump["labels"] = [label.name for label in issue.labels]
-            if issue.comments > 0:
-                for comment in issue.get_comments():
-                    issue_dump["comments"].append(
-                        {
-                            "body": comment.body,
-                            "created_at": comment.created_at,
-                            "user_name": comment.user.login,
-                        }
-                    )
-                logging.debug(
-                    msg=f"Writing issue {issue_name} n.{issue.number}"
+        try:
+            if c_repo_str != str(issue_name.parent):
+                c_repo = gh.get_repo(str(issue_name.parent))
+            try:
+                issue = c_repo.get_issue(
+                    int(re.sub("[^0-9]+", "", issue_name.stem))
                 )
-            with open(issue_dump_path, mode="w+") as f:
-                f.write(yaml.dump(issue_dump))
-        else:
-            logging.info(
-                msg=f"Skipping issue {issue_name} n.{issue.number} as it already exists and override is False"
+                if ".yaml" == issue_name.suffix:
+                    issue_dump_path = corpus_dir / issue_name
+                else:
+                    issue_dump_path = (corpus_dir / issue_name).with_suffix(
+                        ".yaml"
+                    )
+                issue_dump = {"comments": []}
+                if not Path(issue_dump_path).exists() or override:
+                    logging.debug(
+                        msg=f"Collecting issue {issue_name}/n.{issue.number}"
+                    )
+                    issue_dump["title"] = issue.title
+                    issue_dump["body"] = issue.body
+                    issue_dump["closed_at"] = issue.closed_at
+                    issue_dump["created_at"] = issue.created_at
+                    issue_dump["labels"] = [
+                        label.name for label in issue.labels
+                    ]
+                    if issue.comments > 0:
+                        for comment in issue.get_comments():
+                            issue_dump["comments"].append(
+                                {
+                                    "body": comment.body,
+                                    "created_at": comment.created_at,
+                                    "user_name": comment.user.login,
+                                }
+                            )
+                        logging.debug(
+                            msg=f"Writing issue {issue_name} n.{issue.number}"
+                        )
+                    with open(issue_dump_path, mode="w+") as f:
+                        f.write(yaml.dump(issue_dump))
+                else:
+                    logging.info(
+                        msg=f"Skipping issue {issue_name} n.{issue.number} as it already exists and override is False"
+                    )
+            except UnknownObjectException as e:
+                logging.warning(
+                    f"404 Exception; The issue requested ({issue_name}) could no longer be found."
+                )
+        except UnknownObjectException as e:
+            logging.warning(
+                f"404 Exception; The repository requested ({issue_name.parent}) could no longer be found."
             )
 
 
