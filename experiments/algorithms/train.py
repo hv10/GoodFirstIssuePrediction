@@ -22,8 +22,9 @@ from experiments.algorithms.cnn import make_cnn_model
 from experiments.algorithms.dnn import make_dnn_model
 from experiments.data_processing.data_generators import CSVIssueClassesGenerator
 
-# TODO: maybe combine into one function as they differ in only one line
-def train_dnn(
+
+def train_model(
+    model="dnn",
     corpus_dir=(Path(__file__).parent.parent / "corpus"),
     vectorizer_model=(
         Path(__file__).parent.parent / "models" / "vectorizer_model_20000"
@@ -34,7 +35,7 @@ def train_dnn(
     **kwargs
 ):
     """
-    I am the training routine for the DNN model.
+    I am the training routine for the DNN & CNN model.
 
     :param corpus_dir: directory in which the issue corpus lives
     :param vectorizer_model: path to the vectorizer model
@@ -48,11 +49,15 @@ def train_dnn(
     if not output_dir.is_dir():
         output_dir = output_dir.parent
 
-    dnn = make_dnn_model(vocab_size=kwargs.get("vocab_size", 10000))
-    dnn.summary()
+    if model == "cnn":
+        model = make_cnn_model(vocab_size=kwargs.get("vocab_size", 10000))
+    else:
+        model = make_dnn_model(vocab_size=kwargs.get("vocab_size", 10000))
+
+    model.summary()
 
     # end_to_end_model = Sequential([vectorizer, dnn])
-    end_to_end_model = dnn
+    end_to_end_model = model
     end_to_end_model.summary()
 
     end_to_end_model.compile(
@@ -77,88 +82,6 @@ def train_dnn(
     end_to_end_model.fit(
         data_gen, validation_data=val_gen, epochs=100, callbacks=[callbacks]
     )
-
-
-def train_cnn(
-    corpus_dir=(Path(__file__).parent.parent / "corpus"),
-    vectorizer_model=(
-        Path(__file__).parent.parent / "models" / "vectorizer_model_20000"
-    ),
-    gfi_csv=Path(__file__).parent.parent / "corpus" / "df_gfi_1000.csv",
-    ngfi_csv=Path(__file__).parent.parent / "corpus" / "df_ngfi_1000.csv",
-    output_dir=Path(),
-    **kwargs
-):
-    """
-    I am the training routine for the CNN model.
-
-    :param corpus_dir: directory in which the issue corpus lives
-    :param vectorizer_model: path to the vectorizer model
-    :param gfi_csv: path to the good first issue list (csv-file)
-    :param ngfi_csv: path to the non good first issue list (csv-file)
-    :param output_dir: path to where we should put the model checkpoints
-    :param kwargs: extra arguments (e.g. vocab_size)
-    :return:
-    """
-    if not output_dir.is_dir():
-        output_dir = output_dir.parent
-
-    cnn = make_cnn_model(vocab_size=kwargs.get("vocab_size", 10000))
-
-    # end_to_end_model = Sequential([vectorizer, dnn])
-    end_to_end_model = cnn
-    end_to_end_model.summary()
-
-    end_to_end_model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy",
-        metrics=[
-            keras.metrics.Accuracy(),
-            keras.metrics.Recall(),
-            keras.metrics.Precision(),
-            keras.metrics.AUC(),
-        ],
-    )
-    callbacks = [
-        ModelCheckpoint(filepath=str(output_dir / "{epoch:03d}_cnn.hdf5"))
-    ]
-    data_gen = CSVIssueClassesGenerator(
-        corpus_path=corpus_dir,
-        vectorizer=vectorizer_model,
-        gfi_csv=gfi_csv,
-        ngfi_csv=ngfi_csv,
-    )
-    val_gen = CSVIssueClassesGenerator(
-        corpus_path=corpus_dir,
-        vectorizer=vectorizer_model,
-        gfi_csv=gfi_csv,
-        ngfi_csv=ngfi_csv,
-        validation_data=True,
-    )
-    end_to_end_model.fit(
-        data_gen, validation_data=val_gen, epochs=100, callbacks=[callbacks]
-    )
-
-
-def main(
-    corpus, vectorizer, gfi_csv, ngfi_csv, mode="dnn", output_dir=Path.cwd()
-):
-    if mode == "dnn":
-        train_dnn(
-            corpus_dir=corpus,
-            vectorizer_model=vectorizer,
-            gfi_csv=gfi_csv,
-            ngfi_csv=ngfi_csv,
-            output_dir=output_dir,
-        )
-    elif mode == "cnn":
-        train_cnn(
-            corpus_dir=corpus,
-            vectorizer_model=vectorizer,
-            gfi_csv=gfi_csv,
-            ngfi_csv=ngfi_csv,
-            output_dir=output_dir,
-        )
 
 
 if __name__ == "__main__":
@@ -199,4 +122,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     print(args)
-    main(**vars(args))
+    train_model(**vars(args))
